@@ -1,0 +1,31 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: taskflow-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"   # 👈 ADD THIS
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - taskflow_internal
+
+  backend:
+    build: ./backend
+    container_name: taskflow-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mongodb
+    networks:
+      - taskflow_internal
+
+volumes:
+  mongo_data:
+
+networks:
+  taskflow_internal:
+    driver: bridge
